@@ -140,6 +140,12 @@ app_license = "mit"
 # 	}
 # }
 
+doc_events = {
+    "File": {
+        "before_insert": "security_addon.file_validator.validate_memetype.validate_uploaded_file"
+    }
+}
+
 # Scheduled Tasks
 # ---------------
 
@@ -180,6 +186,22 @@ app_license = "mit"
 # override_whitelisted_methods = {
 # 	"frappe.desk.doctype.event.event.get_events": "security_addon.event.get_events"
 # }
+
+override_whitelisted_methods = {
+    "frappe.utils.global_search.search":
+        "security_addon.global_search.secure.secure_global_search",
+
+    "frappe.utils.global_search.web_search":
+        "security_addon.global_search.secure.secure_web_search",
+
+    "frappe.desk.reportview.get_count":
+        "security_addon.global_search.secure.secure_get_count",
+
+    "frappe.desk.reportview.get_list":
+        "security_addon.global_search.secure.secure_get_list",
+}
+
+
 #
 # each overriding function accepts a `data` argument;
 # generated from the base implementation of the doctype dashboard,
