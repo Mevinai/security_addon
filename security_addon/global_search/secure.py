@@ -8,7 +8,7 @@ from frappe import _
 # CONFIGURATION
 # ============================================================
 
-MAX_SEARCH_LENGTH = 20
+MAX_SEARCH_LENGTH = 100
 RATE_LIMIT = 5
 TIME_WINDOW = 10  # seconds
 
