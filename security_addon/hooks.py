@@ -222,6 +222,12 @@ override_whitelisted_methods = {
 # Request Events
 # ----------------
 # before_request = ["security_addon.utils.before_request"]
+
+before_request = [
+    "security_addon.overrides.password.restrict_update_password"
+]
+
+
 # after_request = ["security_addon.utils.after_request"]
 
 # Job Events
