@@ -9,8 +9,8 @@ from frappe import _
 # ============================================================
 
 MAX_SEARCH_LENGTH = 100
-RATE_LIMIT = 5
-TIME_WINDOW = 10  # seconds
+RATE_LIMIT = 20       # Maximum 20 requests
+TIME_WINDOW = 1800    # 30 minutes in seconds
 
 # Allow only letters, numbers and spaces (UI searches should be simple)
 ALLOWED_SAFE_PATTERN = re.compile(r"^[a-zA-Z0-9 ]+$")
