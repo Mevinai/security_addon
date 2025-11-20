@@ -213,30 +213,57 @@ def secure_web_search(text, start=0, limit=20):
 # ============================================================
 # SECURE COUNT
 # ============================================================
-
 @frappe.whitelist()
 def secure_get_count(doctype, filters=None):
+    """
+    Returns count of documents in `doctype`, applying optional filters.
+    Filters can be a dict, JSON string, or empty list.
+    """
     user = frappe.session.user
 
     try:
+        # Sanitize doctype
         doctype = sanitize_string(str(doctype), "doctype")
-        filters = sanitize_filters(filters)
-        check_rate_limit(user)
 
-        allowed = get_allowed_doctypes()
+        # Parse and sanitize filters
+        if filters:
+            if isinstance(filters, str):
+                try:
+                    filters = frappe.parse_json(filters)
+                except Exception:
+                    frappe.logger("security").warning(
+                        f"[BLOCKED] secure_get_count '{doctype}' by {user}: invalid JSON filters"
+                    )
+                    return 0
+            # Convert empty list to empty dict
+            if isinstance(filters, list) and not filters:
+                filters = {}
+            # Ensure dict
+            if not isinstance(filters, dict):
+                frappe.logger("security").warning(
+                    f"[BLOCKED] secure_get_count '{doctype}' by {user}: filters must be dict"
+                )
+                return 0
+            filters = sanitize_filters(filters)
+        else:
+            filters = {}  # no filters
 
-        if doctype not in allowed:
-            return ""
-        if not frappe.has_permission(doctype, "read", user=user):
-            return ""
+        # Permission check
+        if user not in ("Administrator", "Guest") and not frappe.has_permission(doctype, "read", user=user):
+            frappe.logger("security").warning(
+                f"[BLOCKED] secure_get_count '{doctype}' by {user}: Permission Denied"
+            )
+            return 0
 
+        # Return count
         return frappe.db.count(doctype, filters=filters)
 
     except Exception as e:
         frappe.logger("security").warning(
             f"[BLOCKED] secure_get_count '{doctype}' by {user}: {e}"
         )
-        return ""
+        return 0
+
 
 
 # ============================================================
